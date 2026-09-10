@@ -37,6 +37,13 @@ it('builds a readme with the title, package and install line', function () {
         ->and($readme)->toContain('composer require jeffersongoncalves/laravel-cep');
 });
 
+it('ignores composer.lock by default but tracks it when requested', function () {
+    expect(Scaffold::gitignore())->toContain('composer.lock')
+        ->and(Scaffold::gitignore(trackComposerLock: false))->toContain('composer.lock')
+        ->and(Scaffold::gitignore(trackComposerLock: true))->not->toContain('composer.lock')
+        ->and(Scaffold::gitignore(trackComposerLock: true))->toContain('.phpunit.result.cache');
+});
+
 it('emits the remaining templates as non-empty files', function () {
     expect(Scaffold::editorconfig())->toContain('root = true')
         ->and(Scaffold::gitattributes())->not->toBeEmpty()

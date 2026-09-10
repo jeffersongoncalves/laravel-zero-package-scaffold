@@ -80,20 +80,24 @@ class Scaffold
         TXT;
     }
 
-    public static function gitignore(): string
+    /**
+     * @param  bool  $trackComposerLock  Package-type consumers (filament-plugin-cli,
+     *                                   laravel-package-cli) ignore composer.lock — a
+     *                                   library shouldn't ship one. Project-type
+     *                                   consumers (laravel-zero-cli) build a deployable
+     *                                   PHAR and should commit it for reproducible
+     *                                   builds, so they pass true and composer.lock is
+     *                                   left out of the ignore list.
+     */
+    public static function gitignore(bool $trackComposerLock = false): string
     {
-        return <<<'TXT'
-        /vendor/
-        /node_modules/
-        /.phpunit.cache/
-        composer.lock
-        .phpunit.result.cache
-        .DS_Store
-        .idea/
-        .vscode/
-        .env
+        $lines = ['/vendor/', '/node_modules/', '/.phpunit.cache/', '.phpunit.result.cache', '.DS_Store', '.idea/', '.vscode/', '.env'];
 
-        TXT;
+        if (! $trackComposerLock) {
+            $lines[] = 'composer.lock';
+        }
+
+        return implode("\n", $lines)."\n";
     }
 
     public static function changelog(): string
