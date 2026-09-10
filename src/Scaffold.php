@@ -86,7 +86,6 @@ class Scaffold
         /vendor/
         /node_modules/
         /.phpunit.cache/
-        /build/
         composer.lock
         .phpunit.result.cache
         .DS_Store
