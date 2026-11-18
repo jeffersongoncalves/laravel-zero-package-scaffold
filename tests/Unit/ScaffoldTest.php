@@ -44,6 +44,16 @@ it('ignores composer.lock by default but tracks it when requested', function () 
         ->and(Scaffold::gitignore(trackComposerLock: true))->toContain('.phpunit.result.cache');
 });
 
+it('auto-merges only single-commit github-actions minor/patch PRs from dependabot, pinned to the checked commit', function () {
+    $workflow = Scaffold::workflowDependabotAutoMerge();
+
+    expect($workflow)->toContain("github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.commits == 1")
+        ->and($workflow)->toContain("package-ecosystem == 'github_actions'")
+        ->and($workflow)->toContain('--match-head-commit "$HEAD_SHA"')
+        ->and($workflow)->not->toContain('semver-major')
+        ->and($workflow)->not->toContain('github.actor');
+});
+
 it('emits the remaining templates as non-empty files', function () {
     expect(Scaffold::editorconfig())->toContain('root = true')
         ->and(Scaffold::gitattributes())->not->toBeEmpty()
