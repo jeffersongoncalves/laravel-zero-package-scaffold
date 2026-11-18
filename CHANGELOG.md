@@ -2,6 +2,16 @@
 
 All notable changes to `laravel-zero-package-scaffold` will be documented in this file.
 
+## 1.1.0 - 2026-11-18
+
+### Features
+
+- `Scaffold::workflowDependabotAutoMerge()`: the approved `dependabot-auto-merge.yml` (github-actions minor/patch only, single-commit PRs opened by `dependabot[bot]`, merged with `--match-head-commit`).
+
+### CI
+
+- PHPStan runs on PHP 8.4.
+
 ## 1.0.2 - 2026-09-10
 
 Fix: gitignore() now accepts a trackComposerLock flag so project-type consumers (laravel-zero-cli) can commit composer.lock instead of ignoring it, matching bb-cli/repos-cli convention.
