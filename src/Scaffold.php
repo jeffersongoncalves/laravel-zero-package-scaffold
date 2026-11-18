@@ -245,6 +245,46 @@ class Scaffold
         YAML;
     }
 
+    /**
+     * The approved dependabot-auto-merge.yml, byte for byte (what `repos audit --only=automerge` compares against):
+     * only github-actions minor/patch updates, only from a single-commit PR opened by dependabot[bot], merged
+     * pinned to the head commit the checks ran on. Composer/npm and every major stay for human review.
+     */
+    public static function workflowDependabotAutoMerge(): string
+    {
+        return <<<'YAML'
+        name: dependabot-auto-merge
+
+        on:
+          pull_request:
+          workflow_call:
+
+        permissions:
+          contents: write
+          pull-requests: write
+
+        jobs:
+          dependabot:
+            runs-on: ubuntu-latest
+            timeout-minutes: 5
+            if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' && github.event.pull_request.commits == 1 }}
+
+            steps:
+              - name: Dependabot metadata
+                id: metadata
+                uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+
+              - name: Squash-merge patch & minor github-actions updates
+                if: ${{ steps.metadata.outputs.package-ecosystem == 'github_actions' && contains(fromJSON('["version-update:semver-minor", "version-update:semver-patch"]'), steps.metadata.outputs.update-type) }}
+                run: gh pr merge --squash --match-head-commit "$HEAD_SHA" "$PR_URL"
+                env:
+                  PR_URL: ${{ github.event.pull_request.html_url }}
+                  HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        YAML;
+    }
+
     public static function readme(string $title, string $vendor, string $package, string $description, string $installRequire): string
     {
         return <<<MD
